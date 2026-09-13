@@ -33,7 +33,7 @@ per-order reasoning, threshold management, and a sync log.
 
 ## Demo
 
-📹 Two-minute demo: [View Demo on Google Drive](https://drive.google.com/drive/folders/11NybPe-UrSWXFpfQhzcAQOIvcvD3wlwD?usp=drive_link)[cite: 1]
+📹 Two-minute demo: [View Demo on Google Drive](https://drive.google.com/drive/folders/11NybPe-UrSWXFpfQhzcAQOIvcvD3wlwD?usp=drive_link)
 ## Setup instructions
 
 To run the fully integrated application locally, you will need to start both the Python backend and the Vite frontend.
