@@ -16,7 +16,7 @@ export function AppShell({ connectionState, syncState }: AppShellProps) {
   const [isAgentsOpen, setIsAgentsOpen] = useState(false)
 
   return (
-    <div className="flex h-screen flex-col bg-bg text-zinc-200">
+    <div className="flex h-screen flex-col bg-bg text-fg">
       <TopBar
         connectionState={connectionState}
         syncState={syncState}

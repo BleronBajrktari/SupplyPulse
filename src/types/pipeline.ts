@@ -27,7 +27,7 @@ export interface MatchedItem {
   product_name: string
   visual_quantity: number
   effective_quantity: number
-  requires_manual_mapping: boolean
+  requires_manual_mapping?: boolean
 }
 
 export interface IntegrationsStatus {

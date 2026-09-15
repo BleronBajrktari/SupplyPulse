@@ -6,6 +6,7 @@ import CatalogViewer from './pages/CatalogViewer'
 import SalesVelocity from './pages/SalesVelocity'
 import HealthBoard from './pages/HealthBoard'
 import AlertLog from './pages/AlertLog'
+import { InventoryGrid } from './components/inventory/InventoryGrid'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<UploadScan />} />
         <Route path="/scan" element={<UploadScan />} />
         <Route path="/dashboard" element={<ScanResults />} />
+        <Route path="/inventory" element={<InventoryGrid />} />
         <Route path="/catalog" element={<CatalogViewer />} />
         <Route path="/velocity" element={<SalesVelocity />} />
         <Route path="/health" element={<HealthBoard />} />

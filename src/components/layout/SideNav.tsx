@@ -12,8 +12,8 @@ export function SideNav() {
           className={({ isActive }) =>
             `flex items-center gap-2.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'border-border bg-surface text-zinc-100'
-                : 'border-transparent text-zinc-400 hover:bg-surface-hover hover:text-zinc-200'
+                ? 'border-border bg-surface text-fg'
+                : 'border-transparent text-fg-muted hover:bg-surface-hover hover:text-fg'
             }`
           }
         >

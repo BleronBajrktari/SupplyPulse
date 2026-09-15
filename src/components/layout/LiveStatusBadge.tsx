@@ -40,7 +40,7 @@ export function LiveStatusBadge({ state }: LiveStatusBadgeProps) {
         )}
         <span className={`relative inline-flex h-2 w-2 rounded-full ${dot}`} />
       </span>
-      <span className="text-xs font-medium tabular-nums text-zinc-300">{label}</span>
+      <span className="text-xs font-medium tabular-nums text-fg">{label}</span>
     </button>
   )
 }

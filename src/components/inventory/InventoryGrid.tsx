@@ -55,9 +55,9 @@ export function InventoryGrid() {
   return (
     <div className="flex h-full flex-col gap-4 p-6">
       <div>
-        <h1 className="font-mono text-lg font-semibold text-zinc-100">Live Inventory</h1>
+        <h1 className="font-mono text-lg font-semibold text-fg">Live Inventory</h1>
         {data && (
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-fg-muted">
             {data.meta.total} SKUs tracked · {data.meta.lowCount} need attention
           </p>
         )}

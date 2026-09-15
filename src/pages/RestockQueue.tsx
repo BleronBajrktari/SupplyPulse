@@ -78,7 +78,11 @@ export default function RestockQueue() {
       <div className="min-w-0 flex-1 space-y-6">
         <section>
           <h2 className="mb-3 text-sm font-semibold text-zinc-300">Urgency Heatmap</h2>
-          <UrgencyHeatmap plans={plans} selectedId={selectedId} onSelect={setSelectedId} />
+          <UrgencyHeatmap
+            tiles={plans.map((p) => ({ id: p.planId, label: p.lines[0]?.sku ?? p.planId, urgencyScore: p.urgencyScore }))}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
         </section>
 
         <section className="space-y-2">

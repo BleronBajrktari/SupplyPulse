@@ -51,7 +51,7 @@ export default function AlertLog() {
   if (error || !log) {
     return (
       <div className="p-6">
-        <div className="rounded-md border border-status-critical/30 bg-status-critical/5 p-4 text-sm text-zinc-300">
+        <div className="rounded-md border border-status-critical/30 bg-status-critical/5 p-4 text-sm text-fg">
           Couldn't load the alert log.
           <button onClick={retry} className="ml-2 font-medium text-sky-400 hover:underline">
             Retry
@@ -64,13 +64,13 @@ export default function AlertLog() {
   return (
     <div className="flex flex-col gap-4 p-6">
       <div>
-        <h1 className="font-mono text-lg font-semibold text-zinc-100">Restock Alert Log</h1>
-        <p className="mt-1 text-sm text-zinc-500">History of past scans and the reorders they triggered.</p>
+        <h1 className="font-mono text-lg font-semibold text-fg">Restock Alert Log</h1>
+        <p className="mt-1 text-sm text-fg-muted">History of past scans and the reorders they triggered.</p>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-border">
         <table className="w-full text-sm">
-          <thead className="bg-surface text-left text-xs uppercase tracking-wide text-zinc-500">
+          <thead className="bg-surface text-left text-xs uppercase tracking-wide text-fg-muted">
             <tr>
               <th className="w-8 px-3 py-2" />
               <th className="px-3 py-2 font-medium">Timestamp</th>
@@ -90,12 +90,12 @@ export default function AlertLog() {
                 <Fragment key={entry.id}>
                   <tr
                     onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                    className="cursor-pointer border-t border-border text-zinc-200 hover:bg-surface-hover"
+                    className="cursor-pointer border-t border-border text-fg hover:bg-surface-hover"
                   >
-                    <td className="px-3 py-2 text-zinc-500">
+                    <td className="px-3 py-2 text-fg-muted">
                       {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                     </td>
-                    <td className="px-3 py-2 text-zinc-400">{formatTimestamp(entry.timestamp)}</td>
+                    <td className="px-3 py-2 text-fg-muted">{formatTimestamp(entry.timestamp)}</td>
                     <td className="px-3 py-2 font-medium">{entry.shop}</td>
                     <td className="px-3 py-2 tabular-nums">{entry.skus_detected}</td>
                     <td className="px-3 py-2 tabular-nums">{entry.items_to_reorder}</td>
@@ -130,9 +130,9 @@ export default function AlertLog() {
                       <td colSpan={8} className="px-4 py-3">
                         <ul className="space-y-1">
                           {entry.items.map((item) => (
-                            <li key={item.sku_id} className="flex justify-between text-sm text-zinc-300">
+                            <li key={item.sku_id} className="flex justify-between text-sm text-fg">
                               <span>{item.product_name}</span>
-                              <span className="tabular-nums text-zinc-400">
+                              <span className="tabular-nums text-fg-muted">
                                 {item.on_shelf_qty} on shelf → +{item.suggested_qty} ({formatCurrency(item.estimated_cost)})
                               </span>
                             </li>
