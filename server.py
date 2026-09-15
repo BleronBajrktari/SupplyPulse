@@ -194,7 +194,7 @@ async def scan(
             yield _sse_step(3, "Loading sales velocity from Google Sheets", "running")
             sales_db = None
             sheets_live = False
-            if os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE") and os.getenv("GOOGLE_SHEET_ID"):
+            if (os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE") or os.getenv("GOOGLE_SHEETS_CREDENTIALS_JSON")) and os.getenv("GOOGLE_SHEET_ID"):
                 try:
                     from sheets_integration import fetch_sales_velocity
                     sales_db = fetch_sales_velocity()
@@ -361,7 +361,7 @@ async def get_catalog():
 @app.get("/sales-velocity")
 async def get_sales_velocity():
     """Return live Google Sheets sales velocity data (falls back to mock)."""
-    if os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE") and os.getenv("GOOGLE_SHEET_ID"):
+    if (os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE") or os.getenv("GOOGLE_SHEETS_CREDENTIALS_JSON")) and os.getenv("GOOGLE_SHEET_ID"):
         try:
             from sheets_integration import fetch_sales_velocity
             velocity = fetch_sales_velocity()
@@ -434,7 +434,8 @@ async def health_check():
         results["notion"] = {"status": "unconfigured"}
 
     # Google Sheets
-    if os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE") and os.getenv("GOOGLE_SHEET_ID"):
+    google_creds = os.getenv("GOOGLE_SHEETS_CREDENTIALS_FILE") or os.getenv("GOOGLE_SHEETS_CREDENTIALS_JSON")
+    if google_creds and os.getenv("GOOGLE_SHEET_ID"):
         try:
             t0 = time.time()
             from sheets_integration import _get_client
