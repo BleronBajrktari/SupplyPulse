@@ -1,75 +1,25 @@
-# React + TypeScript + Vite
+# 📦 SupplyPulse — AI Inventory Manager for Small Shops
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> One shelf photo → full restocking plan in under 60 seconds.
 
-Currently, two official plugins are available:
+## 🎥 Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**[▶ Watch the 2-minute demo](https://your-demo-link-here.com)**
 
-## React Compiler
+## 📂 Repository Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This project is split into two branches:
 
-## Expanding the ESLint configuration
+| Branch | Contents | Link |
+|--------|----------|------|
+| **[`feat/dea-backend`](https://github.com/BleronBajrktari/SupplyPulse/tree/feat/dea-backend)** | Python backend — FastAPI server, AI agent pipeline, 5 live integrations | [View Backend →](https://github.com/BleronBajrktari/SupplyPulse/tree/feat/dea-backend) |
+| **[`feature/frontend`](https://github.com/BleronBajrktari/SupplyPulse/tree/feature/frontend)** | React frontend — Scan UI, results dashboard, catalog viewer, health board | [View Frontend →](https://github.com/BleronBajrktari/SupplyPulse/tree/feature/frontend) |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🔌 External Apps Integrated
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **AWS Bedrock (Claude Vision)** — Shelf image analysis + AI-powered product matching
+2. **Notion API** — Product catalog database (30 SKUs)
+3. **Google Sheets API** — Sales velocity data + reorder output export
+4. **Slack Webhook** — Real-time alerts with urgency tiers and approval buttons
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+## 🏗️ How It Works
