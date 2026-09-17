@@ -220,17 +220,113 @@ def analyze_shelf_image(image_path: str) -> dict[str, Any]:
 
 
 # ═════════════════════════════════════════════════════════════════════
-# STEP 2 — Catalog Matching & Low-Confidence Fallback
+# STEP 2 — AI-Powered Catalog Matching & Low-Confidence Fallback
 # ═════════════════════════════════════════════════════════════════════
 
-def _fuzzy_match_score(description: str, product_name: str) -> int:
+MATCH_SYSTEM_PROMPT = """\
+You are a product catalog matcher for a retail inventory system.
+
+You will receive:
+1. A list of items detected on a shelf by a vision model (with descriptions)
+2. A product catalog database (with SKU IDs and product names)
+
+Your job: match each detected item to the BEST catalog entry, or mark it "NONE" if nothing fits.
+
+MATCHING RULES:
+- Match based on product identity, not exact wording. "Cheez-It Original, red box" matches "Cheez-It Original Crackers".
+- Different flavors/variants of the same brand ARE different products. "Cheez-It White Cheddar" ≠ "Cheez-It Original".
+- Empty shelf spaces should NEVER match a catalog product — always "NONE".
+- Generic descriptions like "canned goods" or "snack items" with no brand → "NONE".
+- If a detected item could match multiple catalog entries, pick the closest one.
+- Each detected item gets exactly one match or "NONE".
+
+OUTPUT — respond with ONLY valid JSON, no markdown, no preamble:
+[
+  { "detected_index": 0, "matched_sku_id": "SKU_001" or "NONE", "match_reason": "brief reason" },
+  { "detected_index": 1, "matched_sku_id": "NONE", "match_reason": "no catalog match for generic item" },
+  ...
+]"""
+
+
+def _ai_match_items(
+    vision_items: list[dict],
+    catalog_db: dict[str, dict[str, Any]],
+) -> dict[int, str]:
     """
-    Simple word-overlap score between a vision description and a catalog name.
-    Returns the count of shared lowercase words (minimum 2 to qualify).
+    Use Claude to intelligently match detected items to catalog entries.
+    Returns a dict mapping detected_index → matched_sku_id (or "NONE").
     """
-    desc_words = set(description.lower().split())
-    name_words = set(product_name.lower().split())
-    return len(desc_words & name_words)
+    # Build catalog summary for the prompt
+    catalog_lines = []
+    for sku_id, product in catalog_db.items():
+        catalog_lines.append(f"  {sku_id}: {product['product_name']}")
+    catalog_text = "\n".join(catalog_lines)
+
+    # Build detected items summary
+    detected_lines = []
+    for i, item in enumerate(vision_items):
+        desc = item.get("product_description", "Unknown")
+        conf = item.get("confidence", 0)
+        status = item.get("status", "unclear")
+        detected_lines.append(f"  [{i}] \"{desc}\" (confidence: {conf}, status: {status})")
+    detected_text = "\n".join(detected_lines)
+
+    user_prompt = (
+        f"PRODUCT CATALOG ({len(catalog_db)} items):\n{catalog_text}\n\n"
+        f"DETECTED SHELF ITEMS ({len(vision_items)} items):\n{detected_text}\n\n"
+        f"Match each detected item to the best catalog SKU or NONE. Return ONLY valid JSON."
+    )
+
+    client = boto3.client(
+        "bedrock-runtime",
+        region_name=os.environ["AWS_REGION"],
+        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+    )
+
+    request_body = {
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 4096,
+        "system": MATCH_SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": user_prompt}],
+    }
+
+    logger.info("Calling Claude for AI-powered catalog matching …")
+    response = client.invoke_model(
+        modelId=VISION_MODEL,
+        body=json.dumps(request_body),
+        contentType="application/json",
+        accept="application/json",
+    )
+
+    response_body = json.loads(response["body"].read())
+    raw = response_body["content"][0]["text"].strip()
+
+    # Strip markdown fences if present
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1]
+        if raw.endswith("```"):
+            raw = raw[: raw.rfind("```")]
+        raw = raw.strip()
+
+    try:
+        matches = json.loads(raw)
+    except json.JSONDecodeError:
+        logger.error("AI matcher returned invalid JSON, falling back to empty matches")
+        return {}
+
+    # Build index → sku_id mapping
+    result: dict[int, str] = {}
+    for m in matches:
+        idx = m.get("detected_index")
+        sku = m.get("matched_sku_id", "NONE")
+        reason = m.get("match_reason", "")
+        if idx is not None and sku != "NONE":
+            result[idx] = sku
+            logger.debug("AI match: [%d] → %s (%s)", idx, sku, reason)
+
+    logger.info("AI matching complete: %d items matched to catalog", len(result))
+    return result
 
 
 def match_to_catalog(
@@ -238,97 +334,112 @@ def match_to_catalog(
     catalog_db: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """
-    Match vision-detected items against the product catalog.
+    Match vision-detected items against the product catalog using Claude AI.
 
-    Matching strategy (in order):
-      1. Exact ``sku_candidate`` key match.
-      2. Fuzzy word-overlap match (≥ 2 shared words) — best score wins.
-      3. Unmatched → flagged ``requires_manual_mapping``.
+    Strategy:
+      1. Items with confidence < 0.5 → skip, flag for manual review.
+      2. Send all remaining items + full catalog to Claude in one call.
+      3. Claude returns the best SKU match for each item (or NONE).
+      4. Merge matched catalog data into the result.
 
     Low-confidence mitigation:
-      - confidence < 0.5 → ``requires_manual_mapping = True``
+      - confidence < 0.5 → requires_manual_mapping = True
       - confidence 0.3–0.6 (partial occlusion) →
         effective_quantity = avg(vision_estimate, safety_threshold)
     """
     items = vision_output.get("items", [])
     results: list[dict[str, Any]] = []
 
-    for item in items:
-        sku_candidate: str = item.get("sku_candidate", "")
-        description: str = item.get("product_description", "")
-        confidence: float = item.get("confidence", 0.0)
-        visual_qty: int | None = item.get("estimated_quantity")
-        status: str = item.get("status", "unclear")
-        notes: str = item.get("notes", "")
+    # Separate low-confidence items before AI matching
+    matchable_indices: list[int] = []
+    for i, item in enumerate(items):
+        confidence = item.get("confidence", 0.0)
+        if confidence < 0.5:
+            # Too low — skip AI matching, flag directly
+            results.append({
+                "vision_description": item.get("product_description", ""),
+                "vision_sku_candidate": item.get("sku_candidate", ""),
+                "confidence": confidence,
+                "visual_quantity": item.get("estimated_quantity"),
+                "status": item.get("status", "unclear"),
+                "notes": item.get("notes", ""),
+                "matched": False,
+                "requires_manual_mapping": True,
+                "effective_quantity": item.get("estimated_quantity") or 0,
+                "_original_index": i,
+            })
+        else:
+            matchable_indices.append(i)
+
+    # Run AI matching on all matchable items in one call
+    matchable_items = [items[i] for i in matchable_indices]
+    ai_matches: dict[int, str] = {}
+    if matchable_items and catalog_db:
+        try:
+            # AI returns indices relative to the full items list
+            ai_matches = _ai_match_items(items, catalog_db)
+        except Exception as exc:
+            logger.warning("AI matching failed, all items will need manual review: %s", exc)
+
+    # Process matchable items with AI results
+    for i in matchable_indices:
+        item = items[i]
+        description = item.get("product_description", "")
+        confidence = item.get("confidence", 0.0)
+        visual_qty = item.get("estimated_quantity")
+        status = item.get("status", "unclear")
+        notes = item.get("notes", "")
 
         entry: dict[str, Any] = {
             "vision_description": description,
-            "vision_sku_candidate": sku_candidate,
+            "vision_sku_candidate": item.get("sku_candidate", ""),
             "confidence": confidence,
             "visual_quantity": visual_qty,
             "status": status,
             "notes": notes,
             "matched": False,
             "requires_manual_mapping": False,
+            "_original_index": i,
         }
 
-        # ── Confidence too low → skip matching, flag for review ──
-        if confidence < 0.5:
-            entry["requires_manual_mapping"] = True
-            entry["effective_quantity"] = visual_qty if visual_qty is not None else 0
-            logger.debug(
-                "Low confidence (%.2f) for '%s' — flagged for manual mapping",
-                confidence, description,
-            )
-            results.append(entry)
-            continue
+        matched_sku_id = ai_matches.get(i)
+        matched_product = catalog_db.get(matched_sku_id) if matched_sku_id else None
 
-        # ── Try exact key match ──
-        matched_product: dict[str, Any] | None = catalog_db.get(sku_candidate)
-
-        # ── Try fuzzy match ──
-        if matched_product is None:
-            best_score = 0
-            for _sku_id, product in catalog_db.items():
-                score = _fuzzy_match_score(description, product["product_name"])
-                if score > best_score and score >= 2:
-                    best_score = score
-                    matched_product = product
-
-        # ── No match found ──
         if matched_product is None:
             entry["requires_manual_mapping"] = True
             entry["effective_quantity"] = visual_qty if visual_qty is not None else 0
-            logger.debug("No catalog match for '%s'", description)
             results.append(entry)
             continue
 
-        # ── Successful match — merge catalog fields ──
+        # Successful match — merge catalog fields
         entry["matched"] = True
         entry["sku_id"] = matched_product["sku_id"]
         entry["product_name"] = matched_product["product_name"]
-        entry["category"] = matched_product["category"]
+        entry["category"] = matched_product.get("category", "")
         entry["cost_price"] = matched_product["cost_price_per_unit"]
         entry["retail_price"] = matched_product["retail_price_per_unit"]
         entry["lead_time_days"] = matched_product["typical_reorder_lead_time_days"]
         entry["safety_threshold"] = matched_product["minimum_safety_threshold"]
         entry["reorder_unit_quantity"] = matched_product["reorder_unit_quantity"]
 
-        # ── Occlusion adjustment (confidence 0.3–0.6) ──
+        # Occlusion adjustment (confidence 0.3–0.6)
         if 0.3 <= confidence <= 0.6 and visual_qty is not None:
             adjusted = round(
                 (visual_qty + matched_product["minimum_safety_threshold"]) / 2
             )
             entry["effective_quantity"] = adjusted
             entry["notes"] += " [qty adjusted: occluded estimate averaged with safety threshold]"
-            logger.debug(
-                "Occlusion adjustment for %s: visual=%s → effective=%s",
-                matched_product["sku_id"], visual_qty, adjusted,
-            )
         else:
             entry["effective_quantity"] = visual_qty if visual_qty is not None else 0
 
         results.append(entry)
+
+    # Sort by original index to preserve order
+    results.sort(key=lambda x: x.get("_original_index", 0))
+
+    # Clean up internal field
+    for r in results:
+        r.pop("_original_index", None)
 
     n_matched = sum(1 for r in results if r["matched"])
     n_manual = sum(1 for r in results if r["requires_manual_mapping"])
