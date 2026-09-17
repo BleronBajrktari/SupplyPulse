@@ -1,7 +1,12 @@
 import { CheckCircle2, ChevronDown, ChevronRight, Loader2, Send, XCircle } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useAsync } from "../hooks/useAsync";
-import { fetchAlertLog, resendAlert } from "../mocks/historyData";
+import { fetchScanHistory, resendAlert } from "../lib/api";
+
+async function fetchAlertLog() {
+  const { scans } = await fetchScanHistory();
+  return scans;
+}
 
 function formatCurrency(n: number): string {
   return `$${n.toFixed(2)}`;
@@ -83,7 +88,7 @@ export default function AlertLog() {
             </tr>
           </thead>
           <tbody>
-            {log.map((entry) => {
+            {log.map((entry: any) => {
               const isExpanded = expandedId === entry.id;
               const justResent = resentIds.has(entry.id);
               return (
@@ -129,7 +134,7 @@ export default function AlertLog() {
                     <tr className="border-t border-border bg-bg">
                       <td colSpan={8} className="px-4 py-3">
                         <ul className="space-y-1">
-                          {entry.items.map((item) => (
+                          {entry.items.map((item:any) => (
                             <li key={item.sku_id} className="flex justify-between text-sm text-fg">
                               <span>{item.product_name}</span>
                               <span className="tabular-nums text-fg-muted">

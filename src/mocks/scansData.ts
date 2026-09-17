@@ -3,7 +3,7 @@ import type { ShelfScan } from '../types/scan'
 export const SCANS: ShelfScan[] = [
   {
     scanId: 'scan_8f2a',
-    imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&h=1200&fit=crop&q=80',
+    imageUrl: '/shelf_photo.jpg',
     imageWidth: 1600,
     imageHeight: 1200,
     status: 'complete',

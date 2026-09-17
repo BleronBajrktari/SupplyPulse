@@ -63,9 +63,18 @@ export default function UploadScan() {
           return next;
         });
       },
-      onResult: (result: ScanResult) => {
-        setPhase("complete");
-        setTimeout(() => navigate("/dashboard", { state: { result } }), 700);
+        onResult: (result: ScanResult) => {
+        localStorage.setItem("lastScanResult", JSON.stringify(result));
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            localStorage.setItem("lastScanImage", reader.result as string);
+            setTimeout(() => navigate("/dashboard", { state: { result } }), 700);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          setTimeout(() => navigate("/dashboard", { state: { result } }), 700);
+        }
       },
       onError: (msg: string) => {
         setPhase("error");

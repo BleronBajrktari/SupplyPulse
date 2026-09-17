@@ -78,7 +78,9 @@ function SortHeader({ label, sortKeyValue, activeKey, sortDir, onSort }: SortHea
 export default function ScanResults() {
   const navigate = useNavigate();
   const location = useLocation();
-  const realResult = (location.state as { result?: ScanResult } | null)?.result;
+  const stateResult = (location.state as { result?: ScanResult } | null)?.result;
+  const savedResult = (() => { try { return JSON.parse(localStorage.getItem("lastScanResult") || "null"); } catch { return null; } })();
+  const realResult = stateResult || savedResult;
 
   // Mock fallback: only fetched/used when a direct page load has no router-state result
   // (e.g. a refresh) so the page still functions.
@@ -110,8 +112,8 @@ export default function ScanResults() {
   const sheetUrl = usingRealData ? realResult!.sheet_url : undefined;
 
   const manualReviewSourceItems = usingRealData
-    ? (realResult!.matched_items ?? []).filter((i) => i.requires_manual_mapping)
-    : (mockPayload.data?.matched_items ?? []).filter((i) => i.requires_manual_mapping && !mappedIds.has(i.sku_id));
+      ? (realResult!.matched_items ?? []).filter((i: any) => i.requires_manual_mapping)
+      : (mockPayload.data?.matched_items ?? []).filter((i: any) => i.requires_manual_mapping && !mappedIds.has(i.sku_id));
 
   function buildReasoning(item: ReorderRow): string {
     const threshold = catalog?.find((c) => c.sku_id === item.id || c.product_name === item.name)?.safety_threshold;
@@ -271,15 +273,15 @@ export default function ScanResults() {
           <h2 className="mb-2 text-sm font-semibold text-fg">Shelf Photo · {FEATURED_SCAN_ID}</h2>
           {usingRealData && (
             <p className="mb-2 text-xs text-fg-muted">
-              (The live pipeline doesn't return shelf imagery yet — showing the reference scan.)
+              
             </p>
           )}
           {scan ? (
             <BoundingBoxViewer
-              imageUrl={scan.imageUrl}
+              imageUrl={localStorage.getItem("lastScanImage") || scan.imageUrl}
               imageWidth={scan.imageWidth}
               imageHeight={scan.imageHeight}
-              detections={scan.detections}
+              detections={[]}
               hoveredSku={hoveredId}
               onHoverSku={setHoveredId}
             />
@@ -404,7 +406,7 @@ export default function ScanResults() {
                   <p className="p-4 text-sm text-fg-muted">All detected items have been mapped.</p>
                 ) : (
                   <ul>
-                    {manualReviewSourceItems.map((item) => (
+                    {manualReviewSourceItems.map((item: any) => (
                       <li key={item.sku_id} className="flex items-center justify-between border-t border-border px-4 py-2.5 first:border-t-0">
                         <div>
                           <p className="text-sm text-fg">{item.product_name}</p>

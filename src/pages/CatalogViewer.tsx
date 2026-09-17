@@ -82,8 +82,8 @@ export default function CatalogViewer() {
                   <td className="px-3 py-2 font-medium">{entry.product_name}</td>
                   <td className="px-3 py-2 text-fg-muted">{entry.category}</td>
                   <td className="px-3 py-2 tabular-nums">{entry.safety_threshold}</td>
-                  <td className="px-3 py-2 tabular-nums">{formatCurrency(entry.cost_price)}</td>
-                  <td className="px-3 py-2 tabular-nums">{formatCurrency(entry.retail_price)}</td>
+                  <td className="px-3 py-2 tabular-nums">{formatCurrency(entry.cost_price_per_unit)}</td>
+                  <td className="px-3 py-2 tabular-nums">{formatCurrency(entry.retail_price_per_unit)}</td>
                   <td className="px-3 py-2 tabular-nums text-fg-muted">{entry.lead_time_days}d</td>
                   <td className="px-3 py-2 text-fg-muted">{entry.reorder_unit}</td>
                 </tr>
