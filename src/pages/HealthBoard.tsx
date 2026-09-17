@@ -38,8 +38,8 @@ export default function HealthBoard() {
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-mono text-lg font-semibold text-zinc-100">Integration Health</h1>
-          <p className="mt-1 text-sm text-zinc-500">Live connection state across the pipeline's five integrations.</p>
+          <h1 className="font-mono text-lg font-semibold text-fg">Integration Health</h1>
+          <p className="mt-1 text-sm text-fg-muted">Live connection state across the pipeline's five integrations.</p>
         </div>
         <div className="flex items-center gap-2">
           <a
@@ -71,17 +71,17 @@ export default function HealthBoard() {
               return (
                 <div key={entry.id} className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-zinc-100">{entry.name}</span>
+                    <span className="text-sm font-semibold text-fg">{entry.name}</span>
                     {testing ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+                      <Loader2 className="h-4 w-4 animate-spin text-fg-muted" />
                     ) : (
                       <StateIcon className={`h-4 w-4 ${meta.className}`} />
                     )}
                   </div>
-                  <p className="text-xs text-zinc-500">{entry.description}</p>
+                  <p className="text-xs text-fg-muted">{entry.description}</p>
                   <div className="mt-auto flex items-center justify-between pt-2">
                     <span className={`text-xs font-medium ${meta.className}`}>{meta.label}</span>
-                    <span className="font-mono text-xs tabular-nums text-zinc-400">
+                    <span className="font-mono text-xs tabular-nums text-fg-muted">
                       {testing ? "…" : `${entry.latencyMs}ms`}
                     </span>
                   </div>

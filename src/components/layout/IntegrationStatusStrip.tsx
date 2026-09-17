@@ -25,8 +25,8 @@ export function IntegrationStatusStrip() {
               style={{ backgroundColor: status === 'error' ? 'var(--color-status-critical)' : color }}
             />
           </span>
-          <Icon className="h-3 w-3 text-zinc-500" />
-          <span className="text-xs font-medium text-zinc-400">{name}</span>
+          <Icon className="h-3 w-3 text-fg-muted" />
+          <span className="text-xs font-medium text-fg-muted">{name}</span>
         </div>
       ))}
     </div>

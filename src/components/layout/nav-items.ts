@@ -3,12 +3,13 @@ import {
   BookOpen,
   History,
   LayoutDashboard,
+  LayoutGrid,
   ScanLine,
   TrendingUp,
   type LucideIcon,
 } from 'lucide-react'
 
-export type NavKey = 'scan' | 'dashboard' | 'catalog' | 'velocity' | 'health' | 'history'
+export type NavKey = 'scan' | 'dashboard' | 'inventory' | 'catalog' | 'velocity' | 'health' | 'history'
 
 export interface NavItem {
   key: NavKey
@@ -20,6 +21,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { key: 'scan', label: 'Scan', path: '/', icon: ScanLine },
   { key: 'dashboard', label: 'Scan Results', path: '/dashboard', icon: LayoutDashboard },
+  { key: 'inventory', label: 'Inventory', path: '/inventory', icon: LayoutGrid },
   { key: 'catalog', label: 'Catalog', path: '/catalog', icon: BookOpen },
   { key: 'velocity', label: 'Sales Velocity', path: '/velocity', icon: TrendingUp },
   { key: 'health', label: 'Integration Health', path: '/health', icon: Activity },

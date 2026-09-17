@@ -31,7 +31,7 @@ export function AgentActivityFeed({ activity, isLoading, limit }: AgentActivityF
   }
 
   if (entries.length === 0) {
-    return <p className="py-6 text-center text-sm text-zinc-500">No agent activity yet.</p>
+    return <p className="py-6 text-center text-sm text-fg-muted">No agent activity yet.</p>
   }
 
   return (
@@ -46,10 +46,10 @@ export function AgentActivityFeed({ activity, isLoading, limit }: AgentActivityF
                 <span className="text-xs font-semibold" style={{ color: stage.color }}>
                   {stage.tool}
                 </span>
-                <span className="shrink-0 text-xs text-zinc-500">{formatRelativeTime(entry.timestamp)}</span>
+                <span className="shrink-0 text-xs text-fg-muted">{formatRelativeTime(entry.timestamp)}</span>
               </div>
-              <p className="mt-0.5 truncate text-sm font-medium text-zinc-100">{entry.action}</p>
-              <p className="truncate text-xs text-zinc-500">{entry.detail}</p>
+              <p className="mt-0.5 truncate text-sm font-medium text-fg">{entry.action}</p>
+              <p className="truncate text-xs text-fg-muted">{entry.detail}</p>
             </div>
           </li>
         )

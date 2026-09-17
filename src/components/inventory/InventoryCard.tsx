@@ -41,20 +41,20 @@ export function InventoryCard({ item }: InventoryCardProps) {
             onError={() => setThumbFailed(true)}
           />
         )}
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-zinc-100">{item.name}</span>
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg">{item.name}</span>
         <StatusBadge status={item.status} />
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <span className="truncate font-mono text-xs text-zinc-500">{item.sku}</span>
-        <span className="shrink-0 text-xs text-zinc-500">{item.category}</span>
+        <span className="truncate font-mono text-xs text-fg-muted">{item.sku}</span>
+        <span className="shrink-0 text-xs text-fg-muted">{item.category}</span>
       </div>
 
       <div className="flex items-center gap-2">
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-hover">
           <div className={`h-full rounded-full ${STATUS_FILL[item.status]}`} style={{ width: `${progress}%` }} />
         </div>
-        <span className="shrink-0 font-mono text-xs tabular-nums text-zinc-300">
+        <span className="shrink-0 font-mono text-xs tabular-nums text-fg">
           {item.currentCount}/{item.threshold}
         </span>
       </div>

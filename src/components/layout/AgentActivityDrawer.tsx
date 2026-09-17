@@ -22,12 +22,12 @@ export function AgentActivityDrawer({ isOpen, onClose }: AgentActivityDrawerProp
       />
       <div className="relative flex h-full w-full max-w-sm flex-col border-l border-border bg-bg p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-mono text-sm font-semibold text-zinc-100">Agent Activity</h2>
+          <h2 className="font-mono text-sm font-semibold text-fg">Agent Activity</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1 text-zinc-400 hover:bg-surface-hover hover:text-zinc-100"
+            className="rounded-md p-1 text-fg-muted hover:bg-surface-hover hover:text-fg"
           >
             <X className="h-4 w-4" />
           </button>

@@ -23,7 +23,7 @@ export default function SalesVelocity() {
   if (error || !velocity) {
     return (
       <div className="p-6">
-        <div className="rounded-md border border-status-critical/30 bg-status-critical/5 p-4 text-sm text-zinc-300">
+        <div className="rounded-md border border-status-critical/30 bg-status-critical/5 p-4 text-sm text-fg">
           Couldn't load sales velocity data.
           <button onClick={retry} className="ml-2 font-medium text-sky-400 hover:underline">
             Retry
@@ -40,8 +40,8 @@ export default function SalesVelocity() {
   return (
     <div className="flex flex-col gap-4 p-6">
       <div>
-        <h1 className="font-mono text-lg font-semibold text-zinc-100">Sales Velocity</h1>
-        <p className="mt-1 text-sm text-zinc-500">Daily sell-through from Google Sheets, top 10 SKUs.</p>
+        <h1 className="font-mono text-lg font-semibold text-fg">Sales Velocity</h1>
+        <p className="mt-1 text-sm text-fg-muted">Daily sell-through from Google Sheets, top 10 SKUs.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -51,7 +51,7 @@ export default function SalesVelocity() {
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-4">
-        <h2 className="mb-3 text-sm font-medium text-zinc-300">Top 10 SKUs by Daily Velocity</h2>
+        <h2 className="mb-3 text-sm font-medium text-fg">Top 10 SKUs by Daily Velocity</h2>
         <div className="h-96 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 24, bottom: 4, left: 0 }}>

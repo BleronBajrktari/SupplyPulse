@@ -1,10 +1,15 @@
-import type { ReorderPlan } from "../../types/restock";
 import "./restock-animations.css";
 
+export interface HeatmapTile {
+  id: string;
+  label: string;
+  urgencyScore: number;
+}
+
 interface Props {
-  plans: ReorderPlan[];
+  tiles: HeatmapTile[];
   selectedId: string | null;
-  onSelect: (planId: string) => void;
+  onSelect: (id: string) => void;
 }
 
 function urgencyColor(score: number): string {
@@ -12,36 +17,33 @@ function urgencyColor(score: number): string {
   return `hsl(0 80% ${l}%)`;
 }
 
-function tileLabel(plan: ReorderPlan): string {
-  return plan.lines[0]?.sku ?? plan.planId;
-}
-
-export function UrgencyHeatmap({ plans, selectedId, onSelect }: Props) {
-  const sorted = [...plans].sort((a, b) => b.urgencyScore - a.urgencyScore);
+export function UrgencyHeatmap({ tiles, selectedId, onSelect }: Props) {
+  const sorted = [...tiles].sort((a, b) => b.urgencyScore - a.urgencyScore);
 
   return (
     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-      {sorted.map((plan) => {
-        const urgent = plan.urgencyScore > 0.85;
-        const selected = plan.planId === selectedId;
-        const darkText = plan.urgencyScore > 0.55;
+      {sorted.map((tile) => {
+        const urgent = tile.urgencyScore > 0.85;
+        const selected = tile.id === selectedId;
+        const darkText = tile.urgencyScore > 0.55;
         return (
           <button
-            key={plan.planId}
-            onClick={() => onSelect(plan.planId)}
-            style={{ backgroundColor: urgencyColor(plan.urgencyScore) }}
+            key={tile.id}
+            onClick={() => onSelect(tile.id)}
+            onMouseEnter={() => onSelect(tile.id)}
+            style={{ backgroundColor: urgencyColor(tile.urgencyScore) }}
             className={[
               "flex aspect-square flex-col items-start justify-between rounded-sm border p-2 text-left transition",
-              "border-[#27272A] hover:border-[#52525B]",
-              selected ? "ring-2 ring-white/70" : "",
+              "border-border hover:border-zinc-400",
+              selected ? "ring-2 ring-zinc-400" : "",
               urgent ? "sp-urgent" : "",
               darkText ? "text-white" : "text-zinc-900",
             ].join(" ")}
-            title={`${tileLabel(plan)} · urgency ${(plan.urgencyScore * 100).toFixed(0)}%`}
+            title={`${tile.label} · urgency ${(tile.urgencyScore * 100).toFixed(0)}%`}
           >
-            <span className="text-xs font-semibold leading-tight">{tileLabel(plan)}</span>
+            <span className="text-xs font-semibold leading-tight">{tile.label}</span>
             <span className="text-lg font-bold tabular-nums">
-              {(plan.urgencyScore * 100).toFixed(0)}
+              {(tile.urgencyScore * 100).toFixed(0)}
             </span>
           </button>
         );

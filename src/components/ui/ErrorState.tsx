@@ -14,8 +14,8 @@ export function ErrorState({ title = "Couldn't load data", code, message, onRetr
     <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-lg border border-status-critical/30 bg-status-critical/5 py-20 text-center">
       <AlertTriangle className="h-8 w-8 text-status-critical" />
       <div>
-        <p className="text-sm font-medium text-zinc-200">{title}</p>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="text-sm font-medium text-fg">{title}</p>
+        <p className="mt-1 text-sm text-fg-muted">
           {message}
           {code ? ` (${code})` : ''}
         </p>
@@ -24,7 +24,7 @@ export function ErrorState({ title = "Couldn't load data", code, message, onRetr
         <button
           type="button"
           onClick={onRetry}
-          className="mt-2 rounded-md border border-status-critical/40 bg-surface px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:bg-surface-hover"
+          className="mt-2 rounded-md border border-status-critical/40 bg-surface px-3 py-1.5 text-xs font-medium text-fg transition-colors hover:bg-surface-hover"
         >
           Retry
         </button>
