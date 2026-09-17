@@ -41,7 +41,7 @@ SupplyPulse is a multi-app AI agent that automates inventory management for smal
                      └──────────────────┘
 ```
 
-### Pipeline Steps (6 stages, ~45–55 seconds):
+### Pipeline Steps:
 
 1. **Claude Vision (AWS Bedrock)** — Analyzes the shelf photo, detects 20–30 products with quantity estimates and confidence scores
 2. **Notion API** — Fetches the product catalog (SKU IDs, pricing, safety thresholds, lead times)
@@ -52,7 +52,7 @@ SupplyPulse is a multi-app AI agent that automates inventory management for smal
 
 ---
 
-## 🔌 External Apps Integrated (4 + AI)
+## 🔌 External Apps Integrated 
 
 | # | App | Role | Integration Method |
 |---|-----|------|--------------------|
