@@ -11,6 +11,15 @@ SupplyPulse is a multi-app AI agent that automates inventory management for smal
 **[▶ Watch the 2-minute demo](https://your-demo-link-here.com)**
 
 ---
+## 📂 Repository Structure
+
+This project is split into two branches:
+
+| Branch | Contents | Link |
+|--------|----------|------|
+| **[`feat/dea-backend`](https://github.com/BleronBajrktari/SupplyPulse/tree/feat/dea-backend)** | Python backend — FastAPI server, AI agent pipeline, 5 live integrations | [View Backend →](https://github.com/BleronBajrktari/SupplyPulse/tree/feat/dea-backend) |
+| **[`feature/frontend`](https://github.com/BleronBajrktari/SupplyPulse/tree/feature/frontend)** | React frontend — Scan UI, results dashboard, catalog viewer, health board | [View Frontend →](https://github.com/BleronBajrktari/SupplyPulse/tree/feature/frontend) |
+
 
 ## 🏗️ How It Works
 
